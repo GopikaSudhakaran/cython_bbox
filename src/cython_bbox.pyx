@@ -1,9 +1,11 @@
+STUFF = "Hi"
 # --------------------------------------------------------
 # Fast R-CNN
 # Copyright (c) 2015 Microsoft
 # Licensed under The MIT License [see LICENSE for details]
 # Written by Sergey Karayev
 # --------------------------------------------------------
+
 
 cimport cython
 import numpy as np
@@ -12,7 +14,15 @@ cimport numpy as np
 DTYPE = np.float
 ctypedef np.float_t DTYPE_t
 
-def bbox_overlaps(
+
+
+def bbox_overlaps(boxes, query_boxes):
+    cdef np.ndarray[DTYPE_t, ndim=2] boxes_contig = np.ascontiguousarray(boxes, dtype=DTYPE)
+    cdef np.ndarray[DTYPE_t, ndim=2] query_contig = np.ascontiguousarray(query_boxes, dtype=DTYPE)
+
+    return bbox_overlaps_c(boxes_contig, query_contig)
+
+cdef np.ndarray[DTYPE_t, ndim=2] bbox_overlaps_c(
         np.ndarray[DTYPE_t, ndim=2] boxes,
         np.ndarray[DTYPE_t, ndim=2] query_boxes):
     """
@@ -53,6 +63,7 @@ def bbox_overlaps(
                     )
                     overlaps[n, k] = iw * ih / ua
     return overlaps
+
 
 def bbox_intersections(boxes, query_boxes):
     cdef np.ndarray[DTYPE_t, ndim=2] boxes_contig = np.ascontiguousarray(boxes, dtype=DTYPE)
